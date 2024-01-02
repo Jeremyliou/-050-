@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stories of Sahara - MBTI Personality Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+            background-color: #ecd9c6;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button {
+            width: 70%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+            justify-content: center;
+            align-items: center;
+        }
+h1, h2, p {
+    text-align: center;
+}
+        #startGameBtn,
+        #nextPageBtn,
+        #submitBtn,
+        #playAgainBtn,
+        #quitBtn {
+            background-color: #000;
+            color: white;
+        }
+
+        .button:hover {
+            background-color: #555;
+        }
+    .button-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Ensures the container takes the full height of the viewport */
+    }
+        .grid-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        .grid-item {
+            border: 1px solid #ccc;
+            padding: 20px;
+            cursor: pointer;
+            border-radius: 15px;
+            transition: background-color 0.3s ease;
+            margin-bottom: 10px;
+        }
+
+        .grid-item:hover {
+            background-color: #87CEEB;
+        }
+
+        .selected {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        #namePage {
+            text-align: center;
+            display: block;
+        }
+
+        #playerNameInput {
+            width: 70%;
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #000;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        #quizContainer {
+            display: none;
+        }
+
+        .result-container {
+            display: none;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #scoreDisplay {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        #resultText {
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="namePage">
+        <h1>Stories of the Sahara</h1>
+        <p>Please enter your name:</p>
+        <input type="text" id="playerNameInput" placeholder="Your Name">
+        <button id="startGameBtn" class="button" onclick="introduceStory()">Start Game</button>
+    </div>
+
+    <div id="storyIntroduction" style="display: none;">
+        <h1>Introduction to Stories of the Sahara</h1>
+        <p>
+            "Stories of Sahara" is a captivating book written by 三毛 (San Mao). This book records the marriage life of San Mao and her lifelong love Jose, the exotic culture of the Sahrawis, and the unstable situation in the desert. After its publication, "Stories of the Sahara" caused a trend and became one of San Mao's representative works. This game is based on the quotes from the book, and will  take you on a journey through the vast and mystical Sahara Desert, unraveling tales of solitude, adventure, and self-discovery.
+        </p>
+        <button id="nextPageBtn" class="button" onclick="startGame()">Next Page</button>
+    </div>
+
+    <div id="quizContainer" style="display: none;">
+        <h1>Stories of the Sahara</h1>
+        <p>Please select the sentence that best matches you:</p>
+        <div id="questionContainer" class="grid-container">
+            <!-- Questions will be dynamically added here -->
+        </div>
+        <button id="submitBtn" class="button" type="button" onclick="submitForm()">Submit</button>
+    </div>
+
+    <div class="result-container" id="resultContainer">
+        <h2>Results</h2>
+        <p id="scoreDisplay"></p>
+        <p id="resultText"></p>
+        <button id="playAgainBtn" class="button" onclick="playAgain()">Play Again</button>
+        <button id="quitBtn" class="button" onclick="quitGame()">Quit</button>
+    </div>
+    <p id="copyright">
+        <p style="text-align: center; font-style: italic;">© 2024 Jeremy Liou & Jeff Chang. All rights reserved.</p>
+    </p>
+
+    <div id="citation">
+        <hr>
+        <p style="text-align: center; font-style: italic;">
+            Original text sourced from: 三毛. "撒哈拉的故事", 皇冠出版社, 1991.
+        </p>
+    </div>
+
+
+    <script>
+        let scores = { "I": 0, "E": 0, "S": 0, "N": 0, "T": 0, "F": 0, "J": 0, "P": 0 };
+        let currentCategory = "I";
+        let currentQuestionIndex = 0;
+
+        const questions = {
+            "I": [
+                { "A": "Rolling down the windows, basking in the gentle breeze, the weather is so splendid that I hesitate to tune into the radio news, fearing it might disrupt the serenity of this moment and place.", "B": "Encountering outsiders in the desert is the most joyous experience. Despite residing in a vast expanse, our minds tend to be insular. Engaging with someone from a different realm, sharing tales of their distant world, continues to evoke excitement and resonance within me." },
+                { "A": "In this moment, everything around is serene, crystal clear, with not a single sound. A comforting fatigue gradually envelops me.", "B": "Your lonely life will come to an end, and from now on, you will have someone to accompany you, and we will spend the long years of our lives together." }
+            ],
+            "E": [
+                { "A": "Where there are people, there is an indescribable vitality and interest.", "B": "Navigating through the vast and eerily quiet wilderness in the afternoon, an inevitable sense of solitude creeps into my heart. However, it also brings a profound sense of liberation. when realizing that I am the lone wanderer in this unimaginably expansive land." }
+            ],
+            "S": [
+                { "A": "Everyone converses loudly. The other two Spanish ladies engage in a discussion about childbirth. Meanwhile, I silently observe every nuance of this child's behavior.", "B": "In this world, I've never felt like a mere part of the masses. Frequently, I find myself deviating from the conventional path of life, engaging in actions devoid of apparent reasons." },
+                { "A": "That's right! Don't move. I'm holding the world's best natural 10-color camera.", "B": "For reasons unknown, a sudden premonition of Barsily's death washes over me. This intuitive feeling has frequently surfaced in my lifetime. It always comes true. In that moment, I'm paralyzed by the ominous foresight, rooted in front of the window, unable to move." }
+            ],
+            "N": [
+                { "A": " herish witnessing the desert's transition to a fiery red during sunset. Every day, as the sun descends, I linger on the rooftop until darkness envelops, yet a profound sense of loneliness inexplicably settles within me.", "B": "The process of life, whether it's spring and white snow, vegetables and tofu, I have to taste what it's like, so that it's not a waste to come here!" }
+            ],
+            "F": [
+                { "A": "I was thinking, the moths must have been extremely happy when they put out the fire.", "B": "I have never dared to take out my camera and snap pictures of these residents whenever I visit a place without getting close to them at all, for I think this is a very disrespectful act." },
+                { "A": "I always sit on the rooftop until it gets dark, but somehow I feel extremely lonely.", "B": "I have a camera that can't be considered too bad, but of course when I say not too bad, I'm comparing my own camera to the little toy-like camera boxes that the average person uses." }
+            ],
+            "T": [
+                { "A": "The good thing is that how others analyze me has nothing to do with me.", "B": "I know you have a bad temperament, but your heart is very good, and quarrels and fights can happen, but we still have to get married." }
+            ],
+            "J": [
+                { "A": "He knows I'm a headstrong woman who's not going to change my plans.", "B": "To live freely, in my interpretation, is to be spiritually civilized." },
+                { "A": "I'm going sailing in the summer, and I've had a hard time getting through school and military service, and it's all coming to an end.", "B": "I have often analyzed myself that it is very difficult to get rid of the class that people are born into." }
+            ],
+            "P": [
+                { "A": "Closed the door and came out, and thus closed the way of life I had once known and ran toward the unknown desert.", "B": "We started saving again, and our next project was a white horse. Modern horses can be paid for in installments, but Jose didn't want to be modern; he had to pay for it all at once." }
+            ]
+        };
+
+        function startGame() {
+            const playerNameInput = document.getElementById("playerNameInput");
+            const playerName = playerNameInput.value.trim();
+
+            if (playerName === "") {
+                alert("Please enter your name.");
+                return;
+            }
+
+            // If the player has entered a name, proceed to the game
+            document.getElementById("namePage").style.display = "none";
+            document.getElementById("quizContainer").style.display = "block";
+            displayQuestion();
+        }
+
+          function introduceStory() {
+        const playerNameInput = document.getElementById("playerNameInput");
+        const playerName = playerNameInput.value.trim();
+
+        if (playerName === "") {
+            alert("Please enter your name.");
+            return;
+        }
+
+        // If the player has entered a name, proceed to story introduction
+        document.getElementById("namePage").style.display = "none";
+        document.getElementById("storyIntroduction").style.display = "block";
+    }
+
+        function startGame() {
+            if (document.getElementById("namePage").style.display !== "none") {
+                // If on the namePage, move to storyIntroduction
+                document.getElementById("namePage").style.display = "none";
+                document.getElementById("storyIntroduction").style.display = "block";
+            } else {
+                // If on storyIntroduction, move to quizContainer
+                document.getElementById("storyIntroduction").style.display = "none";
+                document.getElementById("quizContainer").style.display = "block";
+                displayQuestion();
+            }
+        }
+
+        function displayQuestion() {
+            const questionContainer = document.getElementById("questionContainer");
+            const currentQuestion = questions[currentCategory][currentQuestionIndex];
+
+            questionContainer.innerHTML = `
+                <div class="grid-item" onclick="selectAnswer('A', event)">
+                    <p>${currentQuestion["A"]}</p>
+                </div>
+                <div class="grid-item" onclick="selectAnswer('B', event)">
+                    <p>${currentQuestion["B"]}</p>
+                </div>
+            `;
+        }
+
+        function selectAnswer(answer, event) {
+            const selectedGridItem = document.querySelector(".grid-item.selected");
+            if (selectedGridItem) {
+                selectedGridItem.classList.remove("selected");
+            }
+            event.currentTarget.classList.add("selected", `selected-${answer}`);
+        }
+
+        function submitForm() {
+            const selectedGridItem = document.querySelector(".grid-item.selected");
+            if (!selectedGridItem) {
+                alert("Please select an answer before submitting.");
+                return;
+            }
+
+            // Update scoring logic
+            if (currentCategory === "I" || currentCategory === "E") {
+                scores[currentCategory] += (selectedGridItem.classList.contains("selected-A")) ? 1 : -1;
+            } else {
+                scores[currentCategory] += (selectedGridItem.classList.contains("selected-A")) ? -1 : 1;
+            }
+
+            currentQuestionIndex++;
+
+            if (currentQuestionIndex < questions[currentCategory].length) {
+                displayQuestion();
+            } else {
+                currentQuestionIndex = 0;
+
+                switch (currentCategory) {
+                    case "I":
+                        currentCategory = "E";
+                        break;
+                    case "E":
+                        currentCategory = "S";
+                        break;
+                    case "S":
+                        currentCategory = "N";
+                        break;
+                    case "N":
+                        currentCategory = "F";
+                        break;
+                    case "F":
+                        currentCategory = "T";
+                        break;
+                    case "T":
+                        currentCategory = "J";
+                        break;
+                    case "J":
+                        currentCategory = "P";
+                        break;
+                    case "P":
+                        showResult();
+                        return;
+                }
+
+                selectedGridItem.classList.remove("selected");
+                if (currentCategory !== "P") {
+                    displayQuestion();
+                } else {
+                    showResult();
+                }
+            }
+        }
+
+        function calculateMBTI() {
+            let result = "";
+            result += (scores["I"] >= scores["E"]) ? "I" : "E";
+            result += (scores["S"] >= scores["N"]) ? "S" : "N";
+            result += (scores["T"] >= scores["F"]) ? "T" : "F";
+            result += (scores["J"] >= scores["P"]) ? "J" : "P";
+            return result;
+        }
+
+          function showResult() {
+            const playerNameDisplay = document.getElementById("playerNameDisplay");
+            const resultText = document.getElementById("resultText");
+            const resultContainer = document.getElementById("resultContainer");
+            const scoreDisplay = document.getElementById("scoreDisplay");
+            const personalityExplanation = document.getElementById("personalityExplanation");
+
+
+            console.log("Scores:", scores);
+
+            const finalResult = calculateMBTI();
+            console.log("Final MBTI Type:", finalResult);
+            scoreDisplay.textContent = `Your MBTI type is: ${finalResult}`;
+            resultText.textContent = `You belong to the ${finalResult} type.`;
+            resultContainer.style.display = "block";
+            document.getElementById("quizContainer").style.display = "none";
+        }function resetQuizState() {
+    scores = { "I": 0, "E": 0, "S": 0, "N": 0, "T": 0, "F": 0, "J": 0, "P": 0 };
+    currentCategory = "I";
+    currentQuestionIndex = 0;
+}
+
+function playAgain() {
+    const resultContainer = document.getElementById("resultContainer");
+    resultContainer.style.display = "none";
+
+    const namePage = document.getElementById("namePage");
+    const storyIntroduction = document.getElementById("storyIntroduction");
+    const quizContainer = document.getElementById("quizContainer");
+
+    namePage.style.display = "none";
+    storyIntroduction.style.display = "none";
+    quizContainer.style.display = "block";
+
+    resetQuizState();
+    displayQuestion();
+}
+
+
+        function quitGame() {
+            const namePage = document.getElementById("namePage");
+            const quizContainer = document.getElementById("quizContainer");
+
+            document.getElementById("resultContainer").style.display = "none";
+            quizContainer.style.display = "none";
+            namePage.style.display = "block";
+          resetQuizState();  
+        }
+
+        displayQuestion();
+    </script>
+</body>
+
+</html>
